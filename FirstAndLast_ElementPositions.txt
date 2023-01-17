@@ -1,0 +1,52 @@
+
+1. Find first and last position of element in sorted Array 
+
+Ex : [ 5, 7, 7, 8, 8, 10] target = 8
+	output : [3, 4]
+
+Edge Case :
+
+1. If the target element in the array then 
+	return [ -1, -1]
+
+2. if the target element present only once
+	return [ 3, 3]
+
+3. if the array is empty then return the 
+	[-1. -1]
+
+Answer :
+
+BruteForce Approach 
+
+1. Iterate over the array and search for the
+	element once and update and later next
+	element and update the path 
+   we are traversing the array two times we are not 
+	using the thing that array is sorted 
+
+
+Optimised Approach 
+	Binary Search 
+   while( s <= e ) {
+	m = s + e / 2
+
+  1. First Position
+	if(a[m] < T)
+		s = m + 1;
+	else if(a[m] > T)
+		e = m - 1;
+	else 
+		result = m;
+		e = m - 1;
+  2. Last Position
+	if(a[m] < T)
+		s = m + 1;
+	else if(a[m] > T)
+		e = m - 1;
+	else 
+		result = m;
+		s = m + 1;
+
+    }
+	
