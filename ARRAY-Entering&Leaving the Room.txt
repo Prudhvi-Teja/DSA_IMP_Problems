@@ -1,0 +1,42 @@
+ARRAY-Entering&Leaving the Room
+
+Given a string of 0's and 1's and find the minimum and maximum 
+distinct persons entering or leaving the room
+
+Explanation:
+
+	Input : "1011011101"
+
+	Always maximum to be the number of persons 
+	
+	Max : 10 = s.length();
+
+	
+
+	Solution :
+	if p enters : p++;
+	if p leavers : p--;
+	ans = max(p,ans); 
+
+
+    int N = persons.length();
+    int entered = 0;
+    int result[] = new int[2];
+    result[1] = N;
+    for (int i = 0; i < N; i++) {
+         
+      if (persons.charAt(i) == '1')
+        entered++;
+      else entered--;
+       
+      result[0] = Math.max(result[0],entered);
+       
+      if(entered<0)
+      {
+          entered=0;
+          result[0]++;
+      }
+       
+    }
+ 
+    return result;
