@@ -1,0 +1,58 @@
+To download the Zipkin server, you can follow these steps:
+
+Step 1: Choose a Download Option
+Zipkin server can be downloaded in different ways based on your preference:
+
+- Option 1: Download the executable JAR file.
+- Option 2: Pull the Docker image.
+- Option 3: Build the server from source.
+
+Choose the option that best suits your environment and requirements.
+
+Option 1: Download the Executable JAR File
+You can download the Zipkin server as an executable JAR file from the Maven Central Repository or the GitHub releases page.
+
+Maven Central Repository:
+- Visit the Zipkin project page on Maven Central: https://search.maven.org/artifact/io.zipkin.java/zipkin-server/
+- Download the latest version of the `zipkin-server` JAR file.
+
+GitHub Releases:
+- Go to the Zipkin GitHub releases page: https://github.com/openzipkin/zipkin/releases
+- Download the latest release of the `zipkin-server` JAR file.
+
+Option 2: Pull the Docker Image
+If you prefer using Docker, you can pull the Zipkin server image from Docker Hub:
+
+```
+docker pull openzipkin/zipkin
+```
+
+Option 3: Build the Server from Source
+You can also build the Zipkin server from source code if you want to customize or contribute to the project:
+
+- Clone the Zipkin repository from GitHub: https://github.com/openzipkin/zipkin
+- Build the server using the provided build scripts or tools like Maven or Gradle.
+
+Step 2: Run the Zipkin Server
+Once you have the Zipkin server downloaded or built, you can run it using the appropriate method based on the option you chose.
+
+For the executable JAR file, use the following command:
+
+```
+java -jar zipkin-server-<version>.jar
+```
+
+For the Docker image, use the following command:
+
+```
+docker run -d -p 9411:9411 openzipkin/zipkin
+```
+
+Ensure that the server is running and accessible at `http://localhost:9411` or the specified host and port.
+
+Step 3: Access the Zipkin UI
+Open a web browser and navigate to `http://localhost:9411` or the appropriate URL where the Zipkin server is running. 
+You should see the Zipkin UI, where you can view and analyze the distributed traces.
+
+That's it! You have now downloaded and started the Zipkin server, and you can use it to view the traces generated 
+by your Spring Boot application.
