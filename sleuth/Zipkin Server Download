@@ -1,0 +1,48 @@
+To trace and display the distributed traces in your Spring Boot project with Sleuth, you can integrate it with a tracing system like Zipkin or Jaeger. Here's how you can set it up:
+
+Step 1: Choose a Tracing System
+Select a tracing system that suits your needs. Two popular choices are Zipkin and Jaeger. For this example, let's use Zipkin.
+
+Step 2: Add Zipkin Dependency
+Add the Zipkin client dependency to your project's `pom.xml` or `build.gradle` file:
+
+For Maven:
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-zipkin</artifactId>
+</dependency>
+```
+
+Step 3: Configure Zipkin Endpoint
+In your `application.properties` or `application.yml` file, configure the endpoint for your Zipkin server:
+
+For `application.properties`:
+```properties
+spring.zipkin.base-url=http://your-zipkin-server:9411
+```
+
+For `application.yml`:
+```yaml
+spring:
+  zipkin:
+    base-url: http://your-zipkin-server:9411
+```
+
+Step 4: Start Zipkin Server
+Start the Zipkin server by running it locally or deploying it to your desired environment. 
+Make sure it's accessible at the configured base URL.
+
+Step 5: View Traces
+With the Zipkin server running and your Spring Boot application integrated with Sleuth, you can now view traces.
+
+1. Access the Zipkin server's UI by navigating to `http://your-zipkin-server:9411` in your browser.
+2. Perform actions in your Spring Boot application that generate distributed traces.
+3. Refresh the Zipkin UI, and you should see the traces displayed.
+
+The traces will show the spans corresponding to the traced operations, including the Kafka messaging operations.
+
+Note: Make sure that your Kafka consumer and producer methods are instrumented with Sleuth annotations (`@NewSpan`, `@ContinueSpan`, etc.) if you want to have finer-grained control over the traced operations.
+
+That's it! You have now set up tracing and can view the distributed traces in your Spring Boot project using a 
+tracing system like Zipkin.
