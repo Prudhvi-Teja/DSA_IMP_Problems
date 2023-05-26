@@ -8,3 +8,7 @@ curl -O -L https://github.com/openzipkin/zipkin/releases/download/<zipkin-versio
   
 
   https://repo1.maven.org/maven2/io/zipkin/java/zipkin-server/2.12.9/
+
+  
+  
+  https://dzone.com/articles/spring-cloud-amp-spring-bootimplementing-zipkin-se
