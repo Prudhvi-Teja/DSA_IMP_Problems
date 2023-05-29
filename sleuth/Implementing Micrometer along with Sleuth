@@ -1,67 +1,108 @@
-Certainly! Here are the step-by-step instructions to download Prometheus:
+To implement Micrometer tracing in a Spring Boot project integrated with Kafka and making REST calls, you can follow these step-by-step instructions:
 
-Step 1: Visit the Prometheus Downloads Page
-Go to the official Prometheus website's downloads page at https://prometheus.io/download/ to access the available download options.
+Step 1: Add Micrometer and Sleuth Dependencies
+Include the necessary dependencies in your project's `pom.xml` or `build.gradle` file:
 
-Step 2: Choose the Download Option
-Prometheus can be downloaded in different formats based on your operating system. Select the appropriate option for your environment. For example:
+For Maven:
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
 
-- Option 1: Download the precompiled binaries.
-- Option 2: Use package managers (such as Homebrew on macOS, Chocolatey on Windows, or apt/yum on Linux) to install Prometheus.
-- Option 3: Build Prometheus from source code.
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-sleuth</artifactId>
+</dependency>
 
-Choose the option that best suits your operating system and preferences.
-
-Step 3: Download and Extract Prometheus
-Follow the instructions specific to the download option you selected:
-
-Option 1: Download the Precompiled Binaries
-If you choose to download the precompiled binaries, the steps usually involve the following:
-
-- Select the desired version of Prometheus.
-- Choose the appropriate binary package based on your operating system and architecture (e.g., Linux, macOS, Windows).
-- Download the compressed archive file (e.g., `.tar.gz`, `.zip`).
-- Extract the contents of the downloaded archive to a directory of your choice.
-
-Option 2: Use Package Managers
-If you prefer to use package managers, follow the installation instructions provided for the respective package manager. For example, if you are using Homebrew on macOS, you can install Prometheus with the following command:
-
-```bash
-brew install prometheus
+<dependency>
+    <groupId>io.micrometer</groupId>
+    <artifactId>micrometer-registry-prometheus</artifactId>
+</dependency>
 ```
 
-Option 3: Build Prometheus from Source Code
-If you want to build Prometheus from the source code, follow the instructions provided in the Prometheus repository's documentation.
+For Gradle:
+```groovy
+implementation 'org.springframework.boot:spring-boot-starter-actuator'
+implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
+implementation 'io.micrometer:micrometer-registry-prometheus'
+```
 
-Step 4: Configure Prometheus
-After downloading and extracting Prometheus, you need to configure it to scrape metrics from your applications. The configuration is typically done in a YAML file named `prometheus.yml`.
+Step 2: Configure Micrometer and Sleuth
+Configure Micrometer and Sleuth in your `application.properties` or `application.yml` file:
 
-Create a `prometheus.yml` file and specify the targets (endpoints) to scrape metrics from. For example:
+For `application.properties`:
+```properties
+spring.application.name=my-app
 
+# Enable Micrometer Prometheus registry
+management.metrics.export.prometheus.enabled=true
+
+# Enable Sleuth tracing propagation
+spring.sleuth.propagation.type=B3
+```
+
+For `application.yml`:
 ```yaml
-global:
-  scrape_interval: 15s
+spring:
+  application:
+    name: my-app
 
-scrape_configs:
-  - job_name: 'my-app'
-    static_configs:
-      - targets: ['localhost:8080'] # Replace with your application's hostname and port
+management:
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+spring:
+  sleuth:
+    propagation:
+      type: B3
 ```
 
-Adjust the `targets` section to point to the appropriate hostname and port where your application is exposing metrics.
+These configurations set the application name, enable the Micrometer Prometheus registry, and configure Sleuth to use B3 tracing propagation.
 
-Step 5: Start Prometheus
-To start Prometheus, navigate to the directory where you extracted or installed Prometheus and run the executable file specific to your operating system. For example:
+Step 3: Instrument REST Calls
+For tracing REST calls, no explicit configuration is needed. Sleuth automatically traces the HTTP calls made by Spring `RestTemplate` or `WebClient`. Ensure that you're using one of these components for REST communication.
 
-- Linux: Execute the `prometheus` binary.
-- macOS: Run the `prometheus` binary.
-- Windows: Double-click on the `prometheus.exe` file.
+Step 4: Instrument Kafka Integration
+To trace Kafka integration, you can use Sleuth's `@NewSpan` annotation to create new spans for Kafka operations. You can also annotate the listener methods with `@ContinueSpan` to continue existing spans.
 
-Prometheus will start running and start scraping metrics based on the configuration in the `prometheus.yml` file.
+Here's an example:
 
-Step 6: Access Prometheus Web Interface
-Once Prometheus is running, you can access its web interface by opening a web browser and navigating to `http://localhost:9090`. This is the default address and port for Prometheus.
+```java
+import brave.Span;
+import brave.Tracer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Component;
 
-From the web interface, you can explore and query the collected metrics, set up alerting rules, and create custom visualizations.
+@Component
+public class KafkaConsumer {
 
-That's it! You have now downloaded, installed, and started Prometheus. You can use it to monitor and visualize metrics from your applications, including the metrics captured by Micrometer for distributed tracing.
+    private final Tracer tracer;
+
+    @Autowired
+    public KafkaConsumer(Tracer tracer) {
+        this.tracer = tracer;
+    }
+
+    @KafkaListener(topics = "my-topic")
+    public void consume(String message) {
+        Span kafkaSpan = tracer.nextSpan().name("kafka.consumer").start();
+        try (Tracer.SpanInScope ws = tracer.withSpanInScope(kafkaSpan)) {
+            // Process the Kafka message
+        } finally {
+            kafkaSpan.finish();
+        }
+    }
+}
+```
+
+In this example, the `KafkaConsumer` class is injecting the `Tracer` instance provided by Sleuth. The `consume` method creates a new span using `tracer.nextSpan()` and starts it with the name "kafka.consumer." The actual processing of the Kafka message happens within the span. Finally, the span is finished with `kafkaSpan.finish()`.
+
+Step 5: Run the Application and Collect Traces
+Run your Spring Boot application. Micrometer, along with Sleuth, will start collecting and exporting metrics and traces.
+
+Step 6: Visualize Traces
+To visualize the collected traces, you can use tools like Zipkin or Ja
